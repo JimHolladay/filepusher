@@ -1,0 +1,31 @@
+==============================
+         AMAZON S3
+==============================
+
+-------------------------------------------------------------------------------
+The largest object that can be uploaded in a single PUT is 5 gigabytes.
+For objects larger than 100 megabytes, customers should consider using
+the Multipart Upload capability:
+http://docs.amazonwebservices.com/AmazonS3/latest/dev/UploadingObjects.html
+-------------------------------------------------------------------------------    
+You can use Multi-Object Delete to delete large numbers of objects
+from Amazon S3. This feature allows you to send multiple object keys
+in a single request to speed up your deletes. Amazon does not charge
+you for using Multi-Object Delete:
+http://docs.amazonwebservices.com/AmazonS3/latest/dev/DeletingObjects.html
+-------------------------------------------------------------------------------
+
+
+
+==============================
+      Python Snippets
+==============================
+
+-------------------------------------------------------------------------------
+os.scandir(), new in 3.5, is better and faster than os.listdir()
+ 
+for entry in os.scandir('.'):
+    if not entry.name.startswith('.') and entry.is_file():
+        print(entry.name)
+-------------------------------------------------------------------------------
+

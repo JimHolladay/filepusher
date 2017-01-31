@@ -1,0 +1,30 @@
+# ----------------------------------------------
+#        targets.yml for FilePusher.py
+# ----------------------------------------------
+#       Please ensure UNIX EOL, UTF-8
+# ----------------------------------------------
+#      Report FilePusher issues to JIRA:
+# https://jira.dataconversions.biz/browse/PS-320
+# ----------------------------------------------
+
+Targets:
+  - Name: capstagedev
+    Path: "/capstagemovetest/"
+    Active: False
+    IsMachine: True
+    CopyCount: 2
+  - Name: vidstaging06
+    Path: "/MediaRoot/downloads/"
+    Active: True
+    IsMachine: True
+    CopyCount: 2
+  - Name: vidstaging07
+    Path: "/MediaRoot/downloads/"
+    Active: True
+    IsMachine: True
+    CopyCount: 2
+  - Name: datac00569
+    Path: "/downloads/mp4_source/"
+    Active: False
+    IsMachine: True
+    CopyCount: 2

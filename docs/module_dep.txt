@@ -1,0 +1,4 @@
+pip - defusedxml-0.4.1
+pip - watchdog
+installer - pywin32
+installer - PyYAML-3.11.win-amd64-py3.4
