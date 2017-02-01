@@ -11,7 +11,11 @@ Database:
   # Choose one: cs01, cs02, vs02, vs03, vs04
   DBUser: cs01
   DBName: filepusher
+<<<<<<< HEAD
   DBAddr: ""
+=======
+  DBAddr: 
+>>>>>>> 0dac9bdcc990507c2708b1d3d4c019d77bc5ba04
 
 Machine:
   FreeSpace: 15000000000
@@ -44,8 +48,13 @@ Products:
 Notify:
   - Name: Jim Holladay
     Email: 
+<<<<<<< HEAD
     Slack: 
     SMS: ''
+=======
+    Slack: jim.holladay
+    SMS: 
+>>>>>>> 0dac9bdcc990507c2708b1d3d4c019d77bc5ba04
     Errors:
       - Email: True
         Slack: False
