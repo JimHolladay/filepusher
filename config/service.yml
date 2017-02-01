@@ -11,7 +11,7 @@ Database:
   # Choose one: cs01, cs02, vs02, vs03, vs04
   DBUser: cs01
   DBName: filepusher
-  DBAddr: 192.168.208.61:5432
+  DBAddr: 
 
 Machine:
   FreeSpace: 15000000000
@@ -55,9 +55,9 @@ Notify:
         Slack: True
         SMS: False
   - Name: Jim Holladay
-    Email: jim.holladay@aebn.net
+    Email: 
     Slack: jim.holladay
-    SMS: '8033741524'
+    SMS: 
     Errors:
       - Email: True
         Slack: False
