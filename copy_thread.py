@@ -5,22 +5,24 @@
 #
 # for use with python 3.5
 # ===============================================================================
+""" This module holds the copy process and its pertaining queues. """
 import os
 import shutil as su
 import datetime
 import traceback
 import socket
-from post_copy_thread import post_work_queue
 from subprocess import call
 from time import sleep
 from multiprocessing import Process, Queue, freeze_support, active_children
-from xml_parse.smil_file_parser import SmilParse
 from threading import Thread
-from config.config_ingest_targets import TargetsConf
-from config.config_ingest_service import ServiceConf
-from config.log_settings import log2log
-from file_and_folder import FolderObject
-from csvlogger import csv_log_queue
+
+from .post_copy_thread import post_work_queue
+from .xml_parse.smil_file_parser import SmilParse
+from .config.config_ingest_targets import TargetsConf
+from .config.config_ingest_service import ServiceConf
+from .config.log_settings import log2log
+from .file_and_folder import FolderObject
+from .csvlogger import csv_log_queue
 
 _WORK_QUEUE = Queue(100)
 _TASK_QUEUE = Queue(50)
@@ -31,8 +33,8 @@ def _worker(w_input, output):
     item = w_input.get()
     if item.isinstance(object, FolderObject):
         source_folder = os.path.dirname(item.full_path)
-        lastfolder = os.path.basename(os.path.dirname(item.full_path))
-        print("Copying... " + lastfolder + " to " + item.destination)
+        last_folder = os.path.basename(os.path.dirname(item.full_path))
+        print("Copying... " + last_folder + " to " + item.destination)
         if os.path.exists(item.destination):
             log2log('debug', 'Trying to delete target folder: ' + item.destination)
             su.rmtree(item.destination)
@@ -50,7 +52,7 @@ def _copyafile(source, destination):
     call(["robocopy", os.path.dirname(source), destination, os.path.basename(source),
           "/S", "/NJH", "/NP", "/NJS", "/NFL", "/NC", "/NDL", "/IS", "/XJ"])
 
-    # For future Use when vidstagers are moved to python
+    # For future Use when vidstage script is moved to python
     # su.copy2(source, destination)
 
 
@@ -80,7 +82,7 @@ class ProducerThread(Thread):
         return_target = None
         try:
             # Try not to use the same target as last time (target_hold)
-            for x in range(1, 2):
+            for _ in range(1, 2):
                 targets = TargetsConf().config_ingest()
                 log2log("debug", "Get Target Counts: " + str(self.target_count))
                 if len(targets) > 0:
@@ -180,12 +182,12 @@ class ProducerThread(Thread):
 
                 # Add new process if needed
                 num_of_processes = ServiceConf().concurrent_copies
-                while _TASK_QUEUE.qsize() > 0 and len(active_children()) < num_of_processes:
-                    p = Process(target=_worker, args=(_TASK_QUEUE, _DONE_QUEUE))
-                    p.start()
-                    log2log('debug', "Process count = " + str(len(active_children())))
+                while _TASK_QUEUE.qsize() > 0 and len(active_children) < num_of_processes:
+                    process = Process(target=_worker, args=(_TASK_QUEUE, _DONE_QUEUE))
+                    process.start()
+                    log2log('debug', "Process count = " + str(len(active_children)))
 
-                if len(active_children()) == 0 and _TASK_QUEUE.qsize() == 0:
+                if len(active_children) == 0 and _TASK_QUEUE.qsize() == 0:
                     log2log("debug", "Zeroing out the target counts.")
                     self._zero_target_dict()
             else:
