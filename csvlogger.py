@@ -19,7 +19,7 @@ _CSV_LOG_QUEUE = Queue(100)
 
 class CSVLogThread(Thread):
     """ This class writes to the CSV file. """
-    def __init__(self):
+    def __init__(self, name=None):
         super(CSVLogThread, self).__init__()
 
     def run(self):
@@ -27,7 +27,7 @@ class CSVLogThread(Thread):
             try:
                 if not _CSV_LOG_QUEUE.empty():
                     date_name = datetime.date.today().strftime('%Y-%m-%d')
-                    with open("z:/Archive/" + date_name + ".csv", 'a') as csv_file:
+                    with open("z:/Archive/" + self.name + date_name + ".csv", 'a') as csv_file:
                         line = _CSV_LOG_QUEUE.get()
                         csv_file.write(line)
                         sleep(1)
