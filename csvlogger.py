@@ -28,7 +28,8 @@ class CSVLogThread(Thread):
             try:
                 if not _CSV_LOG_QUEUE.empty():
                     date_name = datetime.date.today().strftime('%Y-%m-%d')
-                    with open("z:/Archive/" + self.name + date_name + ".csv", 'a') as csv_file:
+                    with open("z:/Archive/" + self.name + "_" + date_name + ".csv", 'a') \
+                            as csv_file:
                         line = _CSV_LOG_QUEUE.get()
                         csv_file.write(line)
                         sleep(1)
