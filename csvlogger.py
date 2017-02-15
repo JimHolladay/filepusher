@@ -21,6 +21,7 @@ class CSVLogThread(Thread):
     """ This class writes to the CSV file. """
     def __init__(self, name=None):
         super(CSVLogThread, self).__init__()
+        self.name = name
 
     def run(self):
         while True:
