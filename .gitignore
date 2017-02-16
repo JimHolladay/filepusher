@@ -1,3 +1,4 @@
 pycache/
 .cache/
 __pycache__/
+.idea/
