@@ -10,7 +10,11 @@ import datetime
 from .pre_copy_thread import ImportValidationThread
 from .copy_thread import ProducerThread
 from .post_copy_thread import PostProducerThread
+<<<<<<< HEAD
 from .configuration.log_settings import log2log
+=======
+from .config.log_settings import log2log
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
 from .csvlogger import CSVLogThread
 
 if __name__ == "__main__":

@@ -18,8 +18,13 @@ from threading import Thread
 
 from .copy_thread import _WORK_QUEUE
 from .xml_parse.smil_file_parser import SmilParse
+<<<<<<< HEAD
 from .configuration.config_service import ServiceConf
 from .configuration.log_settings import log2log
+=======
+from .config.config_ingest_service import ServiceConf
+from .config.log_settings import log2log
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
 from .file_and_folder import FolderObject, FileObject
 
 _IMPORT_QUEUE = Queue(200)

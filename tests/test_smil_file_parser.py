@@ -2,6 +2,10 @@
 
 """
 Tests the 'xml_parse.smile_file_parser.py' module.
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
 """
 import os
 import unittest

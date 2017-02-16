@@ -2,3 +2,4 @@ pycache/
 .cache/
 __pycache__/
 .idea/
+tests/__pycache__/

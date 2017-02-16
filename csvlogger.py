@@ -13,7 +13,11 @@ from time import sleep
 from multiprocessing import Queue
 from threading import Thread
 
+<<<<<<< HEAD
 from .configuration.log_settings import log2log
+=======
+from .config.log_settings import log2log
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
 
 _CSV_LOG_QUEUE = Queue(100)
 

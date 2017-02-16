@@ -9,6 +9,10 @@
 import unittest
 from .tests.test_config_ingest_service import TestYamlIngestService
 from .tests.test_config_ingest_targets import TestYamlIngestConfig
+<<<<<<< HEAD
+=======
+from .tests.test_main_thread import TestQueues
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
 from .tests.test_smil_file_parser import TestSmilFileParser
 
 

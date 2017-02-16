@@ -16,6 +16,7 @@ from time import sleep
 from multiprocessing import Process, Queue, freeze_support, active_children
 from threading import Thread
 
+<<<<<<< HEAD
 from .post_copy_thread import _POST_WORK_QUEUE
 from .xml_parse.smil_file_parser import SmilParse
 from .configuration.config_targets import TargetsConf
@@ -23,6 +24,15 @@ from .configuration.config_service import ServiceConf
 from .configuration.log_settings import log2log
 from .file_and_folder import FolderObject
 from .csvlogger import _CSV_LOG_QUEUE
+=======
+from .post_copy_thread import post_work_queue
+from .xml_parse.smil_file_parser import SmilParse
+from .config.config_ingest_targets import TargetsConf
+from .config.config_ingest_service import ServiceConf
+from .config.log_settings import log2log
+from .file_and_folder import FolderObject
+from .csvlogger import csv_log_queue
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
 
 _WORK_QUEUE = Queue(100)
 _TASK_QUEUE = Queue(50)
@@ -122,6 +132,7 @@ class ProducerThread(Thread):
             if not _WORK_QUEUE.empty():
 
                 # Load the copy task queue
+<<<<<<< HEAD
 
                 item = _WORK_QUEUE.get()
                 log2log('debug', 'Producer Popped ' + item.name)
@@ -197,6 +208,74 @@ class ProducerThread(Thread):
                     log2log('debug', "Process count = " + str(len(active_children())))
 
                 if len(active_children()) == 0 and _TASK_QUEUE.qsize() == 0:
+=======
+                try:
+                    item = _WORK_QUEUE.get()
+                    log2log('debug', 'Producer Popped ' + item.name)
+                    file_stub = item.name.split('-')[0]
+
+                    # Get the target path
+                    target = self._get_target()
+                    if target is not None:
+
+                        log2log("debug", "Sending to target: " + str(target))
+                        item.target = target
+                        self.target_count[target['Name']] += 1
+                        item.start_time = datetime.datetime.now()
+                        source_folder = os.path.dirname(item.full_path)
+
+                        # Create string for the CSV log file
+                        statinfo = os.stat(item.full_path)
+                        csv_string = ("Started, " + item.start_time.strftime("%Y-%m-%d") + "," +
+                                      item.start_time.strftime("%H:%M:%S") + "," +
+                                      socket.gethostname() + "," + file_stub + "," +
+                                      item.name + "," + str(statinfo.st_size) + "," +
+                                      target['Name'] + "\n")
+                        if item.isinstance(object, FolderObject):
+                            log2log("debug", "Item " + item.name + " is a folder.")
+                            smil_file = SmilParse(item)
+                            file_list = smil_file.smil_dereference()
+                            item.destination = ("//" + target['Name'] + target['Path'] +
+                                                file_stub + "/")
+                            log2log("info", "Copying folder " + source_folder + " to " +
+                                    item.destination)
+                            for file in file_list:
+                                statinfo = os.stat(file)
+                                filename = os.path.basename(file)
+                                csv_string += ("Started, " +
+                                               item.start_time.strftime("%Y-%m-%d") + "," +
+                                               item.start_time.strftime("%H:%M:%S") + "," +
+                                               socket.gethostname() + "," + file_stub + "," +
+                                               filename + "," + str(statinfo.st_size) + "," +
+                                               target['Name'] + "\n")
+                        else:
+                            # Single file copy setup
+                            log2log('debug', "Item " + item.name + " is a file object.")
+                            item.destination = ("//" + target['Name'] + target['Path'])
+
+                        # Add csv entry to the csv log queue
+                        csv_log_queue.put(csv_string)
+                        # Add work to the copy queue
+                        _TASK_QUEUE.put(item)
+
+                    else:
+                        log2log('info', "No empty targets were found for " + item.name + ".")
+                        _WORK_QUEUE.put(item)
+                        sleep(5)
+
+                except Exception as ex:
+                    log2log('error', "Task Loading Exception:  " + str(ex))
+                    log2log('error', traceback.format_exc())
+
+                # Add new process if needed
+                num_of_processes = ServiceConf().concurrent_copies
+                while _TASK_QUEUE.qsize() > 0 and len(active_children) < num_of_processes:
+                    process = Process(target=_worker, args=(_TASK_QUEUE, _DONE_QUEUE))
+                    process.start()
+                    log2log('debug', "Process count = " + str(len(active_children)))
+
+                if len(active_children) == 0 and _TASK_QUEUE.qsize() == 0:
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
                     log2log("debug", "Zeroing out the target counts.")
                     self._zero_target_dict()
             else:
@@ -207,6 +286,10 @@ class ProducerThread(Thread):
                 item = _DONE_QUEUE.get()
                 self.target_count[item.target['Name']] -= 1
                 item.finish_time = datetime.datetime.now()
+<<<<<<< HEAD
                 _POST_WORK_QUEUE.put(item)
+=======
+                post_work_queue.put(item)
+>>>>>>> 4b408d7375164af2d19e9c52586cd24fa16192c8
                 log2log("debug", "Get Target Counts: " + str(self.target_count))
                 log2log("info", "Adding " + item.name + " to the post copy queue.")
