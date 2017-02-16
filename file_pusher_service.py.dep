@@ -1,4 +1,4 @@
-﻿#===============================================================================
+﻿# ===============================================================================
 # file_pusher_service.py for FilePusher
 # 
 # This holds the windows service part of the code for filepusher.  
@@ -6,14 +6,11 @@
 #         !!!CURRENTLY DEPRECATED!!!
 #
 # for use with python 3.5
-#===============================================================================
-import win32service  
-import win32serviceutil  
-import win32event
-import win32api
-from watch_folder import WatchFolder
+# ===============================================================================
+
 from threading import Thread
-      
+
+
 class FilePusherSvc(win32serviceutil.ServiceFramework):  
     # you can NET START/STOP the service by the following name  
     _svc_name_ = "FilePusher Service"  
@@ -35,10 +32,9 @@ class FilePusherSvc(win32serviceutil.ServiceFramework):
         servicemanager.LogInfoMsg(str(msg))
 
     def sleep(self, sec):
-        win32api.Sleep(sec*1000, True)  
-       
-    # core logic of the service     
-    def SvcDoRun(self):  
+        win32api.Sleep(sec*1000, True)
+
+    def SvcDoRun(self):
         self.ReportServiceStatus(win32service.SERVICE_START_PENDING)
         try:
             self.ReportServiceStatus(win32service.SERVICE_RUNNING)
@@ -74,5 +70,6 @@ class FilePusherSvc(win32serviceutil.ServiceFramework):
       
     def ctrlHandler(ctrlType):
        return True
+
 if __name__ == '__main__':
     win32serviceutil.HandleCommandLine(FilePusherSvc)

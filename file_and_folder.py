@@ -1,14 +1,15 @@
-#===============================================================================
+# ===============================================================================
 # file_and_folder.py for FilePusher
-# 
-# This file contains the class for both the file and folder objects 
+#
+# This file contains the class for both the file and folder objects
 #
 # for use with python 3.5
-#===============================================================================
-'''  This module holds the classes for both files and folders. '''
+# ===============================================================================
+"""  This module holds the classes for both files and folders. """
+
 
 class FileObject(object):
-    
+    """ This is the class for files. """
     def __init__(self, name, full_path):
         self.name = name
         self.full_path = full_path
@@ -17,9 +18,10 @@ class FileObject(object):
         self.destination = ""
         self.start_time = ""
         self.finish_time = ""
-        
+
+
 class FolderObject(object):
-    
+    """ This is the class for folders. """
     def __init__(self, name, full_path):
         self.name = name
         self.full_path = full_path

@@ -1,132 +1,127 @@
-#===============================================================================
+# ===============================================================================
 # smil_file_parser.py for FilePusher
-# 
+#
 # This validates the smil file and its contents.  It requires a specific dict
 # to process with the following items: name, priority, smil_validation and
-# full_path. 
+# full_path.
 #
 # for use with python 3.5
-#===============================================================================
-''' This module checks a SMIL file's filename and contents for validity.'''
-
-import file_and_folder
+# ===============================================================================
+""" This module checks a SMIL file's filename and contents for validity."""
 import os
 import re
-from defusedxml import ElementTree
-from config.log_settings import log2log
 
-class SmilParse():
-    
+from defusedxml import ElementTree
+
+from .. configuration.log_settings import log2log
+
+
+class SmilParse(object):
+    """This is the class that ingests the smil files."""
     def __init__(self, item):
         if item.destination == "":
-            self._FULL_PATH = item.full_path
-            self._DIR_NAME = os.path.dirname(item.full_path) + "/"
+            self.full_path = item.full_path
+            self.dir_name = os.path.dirname(item.full_path) + "/"
         else:
-            self._FULL_PATH = item.destination + item.name
-            self._DIR_NAME = os.path.dirname(item.destination) + "/" 
-        self._BASE_NAME = item.name
+            self.full_path = item.destination + item.name
+            self.dir_name = os.path.dirname(item.destination) + "/"
+        self.base_name = item.name
 
     def _fcheck(self):
-        ''' Test the smil file itself. '''
+        """ Test the smil file itself. """
         smil_fcheck_status = False
-        if not os.path.exists(self._FULL_PATH):
-            log2log("warning", "SmilParse: " + self._FULL_PATH + " doesn't exist.")
-        elif not os.path.isfile(self._FULL_PATH):
-            log2log("warning", "SmilParse: " + self._FULL_PATH + " is not a file.")
-        elif not os.stat(self._FULL_PATH).st_size > 0:
-            log2log("warning", "SmilParse: " + self._FULL_PATH + " has no contents.")
+        if not os.path.exists(self.full_path):
+            log2log("warning", "SmilParse: " + self.full_path + " doesn't exist.")
+        elif not os.path.isfile(self.full_path):
+            log2log("warning", "SmilParse: " + self.full_path + " is not a file.")
+        elif not os.stat(self.full_path).st_size > 0:
+            log2log("warning", "SmilParse: " + self.full_path + " has no contents.")
         else:
             smil_fcheck_status = True
         return smil_fcheck_status
 
     def _fname(self):
-        ''' Use RegEx to check smil file name structure. '''
+        """ Use RegEx to check smil file name structure. """
         stub = '^[a-zA-Z0-9]{4}_[a-zA-Z0-9]*'
         bitrate = '-[0-9]{4}'
         ext = '.smil$'
         pattern = stub + bitrate + ext
-        if re.search(pattern, self._BASE_NAME):
-            smil_fname_status = True
-        else:
-            smil_fname_status = False
+        smil_fname_status = bool(re.search(pattern, self.base_name))
         return smil_fname_status
 
     def _fcontent(self):
-        ''' Parse the XML content to determine validity. This includes testing
-        the individual video files listed in the smil file.'''
+        """" Parse the XML content to determine validity. This includes testing
+        the individual video files listed in the smil file."""
         smil_content_status = False
-        errorcount = 0 
-        
-        #Build the Regex
+        error_count = 0
+
+        # Build the Regex
         stub = '^[a-zA-Z0-9]{4}_[a-zA-Z0-9]*'
-        bitrate = '-[0-9]{3,4}'
+        bit_rate = '-[0-9]{3,4}'
         suffix = '_[0-9]{3,4}x[0-9]{3,4}'
         ext = '.mp4$'
-        pattern = stub + bitrate + suffix + ext       
-        
+        pattern = stub + bit_rate + suffix + ext
+
         # Test each file listed in the smil file
-        with open(self._FULL_PATH, 'r') as f:
-            tree = ElementTree.parse(f)
-                      
+        with open(self.full_path, 'r') as file:
+            tree = ElementTree.parse(file)
+
             for node in tree.iter('video'):
                 mp4str = re.split(':', node.attrib.get('src'))[1]
-                mp4file = self._DIR_NAME + mp4str                
+                mp4file = self.dir_name + mp4str
                 smil_content_status = False
                 if not re.search(pattern, mp4str):
-                    log2log("warning", "SmilParse: " + 
+                    log2log("warning", "SmilParse: " +
                             'Malformed mp4 file name string in SMIL: {}'.format(mp4str))
-                    errorcount += 1
+                    error_count += 1
                     break
                 elif not re.search(pattern, mp4str):
-                    log2log("warning", "SmilParse: " +  
+                    log2log("warning", "SmilParse: " +
                             'Malformed mp4 filename on disk: {}'.format(mp4str))
-                    errorcount += 1
+                    error_count += 1
                     break
                 elif not os.path.exists(mp4file):
                     log2log("warning", "SmilParse: " + 'file not found: {}'.format(mp4file))
-                    errorcount += 1
+                    error_count += 1
                     break
                 else:
                     try:
-                        open(mp4file, 'r')               
-                        if not os.path.getsize(mp4file) > 0 and errorcount == 0:
-                            log2log("warning", "SmilParse: " + 
-                                    'filesize is 0 bytes: {}'.format(mp4str))
+                        open(mp4file, 'r')
+                        if not os.path.getsize(mp4file) > 0 and error_count == 0:
+                            log2log("warning", "SmilParse: " +
+                                    'file size is 0 bytes: {}'.format(mp4str))
                             break
                     except (PermissionError, IOError):
-                        log2log("warning", "SmilParse: " + 
+                        log2log("warning", "SmilParse: " +
                                 'file in use: {}'.format(mp4str))
-                        errorcount += 1
+                        error_count += 1
                         break
-        if errorcount == 0:
+        if error_count == 0:
             smil_content_status = True
         return smil_content_status
 
     def smil_probe(self):
-        ''' Run three local methods to validate everything associated with the 
-        .smil file. '''
-        bReturn = False
-        if (not self._fcheck() or 
-            not self._fname() or 
-            not self._fcontent()):
-            log2log("warning", "SmilParse: " + 'Something is wrong with {}'.format(self._FULL_PATH))
+        """ Run three local methods to validate everything associated with the
+        .smil file. """
+        b_return = False
+        if (not self._fcheck() or
+                not self._fname() or
+                not self._fcontent()):
+            log2log("warning", "SmilParse: " + 'Something is wrong with {}'.format(self.full_path))
         else:
-            bReturn = True
-        return bReturn
-    
+            b_return = True
+        return b_return
+
     def smil_dereference(self):
+        """ Return file list from smil file. """
         file_list = []
         if self.smil_probe():
-            with open(self._FULL_PATH, 'r') as f:
-                tree = ElementTree.parse(f)            
+            with open(self.full_path, 'r') as file:
+                tree = ElementTree.parse(file)
                 for node in tree.iter('video'):
                     mp4str = re.split(':', node.attrib.get('src'))[1]
-                    mp4file = self._DIR_NAME + mp4str
+                    mp4file = self.dir_name + mp4str
                     file_list.append(mp4file)
         else:
-            log2log('debug', "Smil probe failed on " + self._BASE_NAME)
+            log2log('debug', "Smil probe failed on " + self.base_name)
         return file_list
-    
-if __name__ == '__main__':
-    MyObj = SmilParse(SMIL_FILE)
-    MyObj.smil_probe()

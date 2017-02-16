@@ -1,7 +1,7 @@
 # ===============================================================================
 # log_settings.py for FilePusher
 #
-# This is the class that controls the log config settings and ingest..
+# This is the class that controls the log configuration settings and ingest..
 #
 # for use with python 3.5
 # ===============================================================================
